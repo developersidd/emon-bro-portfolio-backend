@@ -46,7 +46,8 @@ app.post("/contact", (req, res) => {
     service: "gmail",
     auth: {
       user: "emonabujafor@gmail.com",
-      pass: "npamuevcbcqkdsja",
+      pass: process.env.EMAIL_PASSWORD,
+
     },
   });
 
@@ -76,3 +77,4 @@ app.get("/", (req, res) => {
 app.listen(process.env.PORT || 5000, () =>
   console.log("Server running on port 5000")
 );
+
