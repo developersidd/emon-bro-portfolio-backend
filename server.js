@@ -1,8 +1,9 @@
+const dotenv = require("dotenv");
 const express = require("express");
 const cors = require("cors");
 const nodemailer = require("nodemailer");
 const mysql = require("mysql2");
-
+dotenv.config();
 const app = express();
 app.use(
   cors({
@@ -47,7 +48,6 @@ app.post("/contact", (req, res) => {
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD,
-
     },
   });
 
@@ -77,5 +77,3 @@ app.get("/", (req, res) => {
 app.listen(process.env.PORT || 5000, () =>
   console.log("Server running on port 5000")
 );
-
-
