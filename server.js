@@ -13,10 +13,10 @@ app.use(express.json());
 
 // MYSQL DB CONNECTION
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "portfolio_db",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 
 db.connect((err) => {
@@ -45,7 +45,7 @@ app.post("/contact", (req, res) => {
   let transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: "emonabujafor@gmail.com",
+      user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD,
 
     },
@@ -53,7 +53,7 @@ app.post("/contact", (req, res) => {
 
   let mailOptions = {
     from: email,
-    to: "emonabujafor@gmail.com",
+    to: process.env.EMAIL_USER,
     subject: "New Contact Message",
     text: `
       Name: ${name}
@@ -77,4 +77,5 @@ app.get("/", (req, res) => {
 app.listen(process.env.PORT || 5000, () =>
   console.log("Server running on port 5000")
 );
+
 
