@@ -46,6 +46,7 @@ const Contact = mongoose.model("Contact", contactSchema);
 app.get("/personal_info", async (req, res) => {
   try {
     const info = await PersonalInfo.findOne();
+    console.log("🚀 ~ info:", info);
     res.json(info);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -54,12 +55,23 @@ app.get("/personal_info", async (req, res) => {
 
 app.post("/contact", async (req, res) => {
   const { name, email, phone, message } = req.body;
-
   try {
-    // store in database
+    // Store in database
     await Contact.create({ name, email, phone, message });
 
-    // send email
+    // Respond immediately
+    res.json({ message: "Message received successfully!" });
+
+    // Send email asynchronously (don't await)
+    sendEmailAsync(name, email, phone, message);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Separate async function for email
+async function sendEmailAsync(name, email, phone, message) {
+  try {
     let transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -69,21 +81,19 @@ app.post("/contact", async (req, res) => {
     });
 
     let mailOptions = {
-      from: email,
+      from: process.env.EMAIL_USER, // Use your email, not the sender's
+      replyTo: email, // Set reply-to as the sender
       to: process.env.EMAIL_USER,
-      subject: "New Contact Message",
+      subject: `New Contact from ${name}`,
       text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nMessage: ${message}`,
     };
 
-    transporter.sendMail(mailOptions, (err) => {
-      if (err) return res.json({ message: "Email sending failed!" });
-      return res.json({ message: "Message sent successfully!" });
-    });
+    await transporter.sendMail(mailOptions);
+    console.log("Email sent successfully");
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Email sending failed:", err);
   }
-});
-
+}
 app.get("/", (req, res) => {
   res.send("Portfolio Backend Server is running");
 });
